@@ -68,31 +68,33 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
 def InceptionResNetV2(input_shape=[299,299,3],
                       classes=1000):
 
-    input_shape = [299,299,3]
+    input_shape = [299,299,3]                                       # 299,299,3  输入
 
     img_input = Input(shape=input_shape)
 
     # Stem block: 299,299,3 -> 35 x 35 x 192
-    x = conv2d_bn(img_input, 32, 3, strides=2, padding='valid')
-    x = conv2d_bn(x, 32, 3, padding='valid')
-    x = conv2d_bn(x, 64, 3)
-    x = MaxPooling2D(3, strides=2)(x)
-    x = conv2d_bn(x, 80, 1, padding='valid')
-    x = conv2d_bn(x, 192, 3, padding='valid')
-    x = MaxPooling2D(3, strides=2)(x)
+    x = conv2d_bn(img_input, 32, 3, strides=2, padding='valid')     # 149，149，32
+    x = conv2d_bn(x, 32, 3, padding='valid')                        # 147，147，32
+    x = conv2d_bn(x, 64, 3)                                         # 147，147，64
+    x = MaxPooling2D(3, strides=2)(x)                               # 73，73，64
+    x = conv2d_bn(x, 80, 1, padding='valid')                        # 73，73，80
+    x = conv2d_bn(x, 192, 3, padding='valid')                       # 71，71，192
+    x = MaxPooling2D(3, strides=2)(x)                               # 35，35，192
 
     # Mixed 5b (Inception-A block):35 x 35 x 192 -> 35 x 35 x 320
-    branch_0 = conv2d_bn(x, 96, 1)
-    branch_1 = conv2d_bn(x, 48, 1)
-    branch_1 = conv2d_bn(branch_1, 64, 5)
-    branch_2 = conv2d_bn(x, 64, 1)
-    branch_2 = conv2d_bn(branch_2, 96, 3)
-    branch_2 = conv2d_bn(branch_2, 96, 3)
-    branch_pool = AveragePooling2D(3, strides=1, padding='same')(x)
-    branch_pool = conv2d_bn(branch_pool, 64, 1)
+    branch_0 = conv2d_bn(x, 96, 1)                                  # 35，35，96
+    branch_1 = conv2d_bn(x, 48, 1)                                  # 35，35，48
+    branch_1 = conv2d_bn(branch_1, 64, 5)                           # 35，35，64
+    branch_2 = conv2d_bn(x, 64, 1)                                  # 35，35，64
+    branch_2 = conv2d_bn(branch_2, 96, 3)                           # 35，35，96
+    branch_2 = conv2d_bn(branch_2, 96, 3)                           # 35，35，96
+
+    branch_pool = AveragePooling2D(3, strides=1, padding='same')(x) # 35，35，192
+    branch_pool = conv2d_bn(branch_pool, 64, 1)                     # 35，35，64
+
     branches = [branch_0, branch_1, branch_2, branch_pool]
 
-    x = Concatenate(name='mixed_5b')(branches)
+    x = Concatenate(name='mixed_5b')(branches)                      # 35，35，320
 
     # 10次Inception-ResNet-A block:35 x 35 x 320 -> 35 x 35 x 320
     for block_idx in range(1, 11):
@@ -155,6 +157,7 @@ def InceptionResNetV2(input_shape=[299,299,3],
 
     return model
 
+# 数值位于[-1, 1]
 def preprocess_input(x):
     x /= 255.
     x -= 0.5
@@ -163,15 +166,18 @@ def preprocess_input(x):
 
 if __name__ == '__main__':
     model = InceptionResNetV2()
-    fname = 'inception_resnet_v2_weights_tf_dim_ordering_tf_kernels.h5'
-    weights_path = get_file(fname,BASE_WEIGHT_URL + fname,cache_subdir='models',file_hash='e693bd0210a403b3192acc6073ad2e96')
-    model.load_weights("inception_resnet_v2_weights_tf_dim_ordering_tf_kernels.h5")
-    img_path = 'elephant.jpg'
-    img = image.load_img(img_path, target_size=(299, 299))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
 
-    x = preprocess_input(x)
+    print(model.summary())
 
-    preds = model.predict(x)
-    print('Predicted:', decode_predictions(preds))
+    # fname = 'inception_resnet_v2_weights_tf_dim_ordering_tf_kernels.h5'
+    # weights_path = get_file(fname,BASE_WEIGHT_URL + fname,cache_subdir='models',file_hash='e693bd0210a403b3192acc6073ad2e96')
+    # model.load_weights("inception_resnet_v2_weights_tf_dim_ordering_tf_kernels.h5")
+    # img_path = 'elephant.jpg'
+    # img = image.load_img(img_path, target_size=(299, 299))
+    # x = image.img_to_array(img)
+    # x = np.expand_dims(x, axis=0)
+
+    # x = preprocess_input(x)
+
+    # preds = model.predict(x)
+    # print('Predicted:', decode_predictions(preds))

@@ -161,18 +161,22 @@ def preprocess_input(x):
 
 if __name__ == '__main__':
     model = Xception()
-    weights_path = get_file('xception_weights_tf_dim_ordering_tf_kernels.h5',
-                                    TF_WEIGHTS_PATH,
-                                    cache_subdir='models')
-    model.load_weights(weights_path)
-    # model.summary()
-    img_path = 'elephant.jpg'
-    img = image.load_img(img_path, target_size=(299, 299))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-    print('Input image shape:', x.shape)
 
-    preds = model.predict(x)
-    print(np.argmax(preds))
-    print('Predicted:', decode_predictions(preds))
+    print(model.summary())
+
+
+    # weights_path = get_file('xception_weights_tf_dim_ordering_tf_kernels.h5',
+    #                                 TF_WEIGHTS_PATH,
+    #                                 cache_subdir='models')
+    # model.load_weights(weights_path)
+    # # model.summary()
+    # img_path = 'elephant.jpg'
+    # img = image.load_img(img_path, target_size=(299, 299))
+    # x = image.img_to_array(img)
+    # x = np.expand_dims(x, axis=0)
+    # x = preprocess_input(x)
+    # print('Input image shape:', x.shape)
+
+    # preds = model.predict(x)
+    # print(np.argmax(preds))
+    # print('Predicted:', decode_predictions(preds))

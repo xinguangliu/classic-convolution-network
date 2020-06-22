@@ -15,33 +15,33 @@ def MobileNet(input_shape=[224,224,3],
               classes=1000):
 
 
-    img_input = Input(shape=input_shape)
+    img_input = Input(shape=input_shape)                                    # 224，224，3
 
     # 224,224,3 -> 112,112,32  
-    x = _conv_block(img_input, 32, strides=(2, 2))
+    x = _conv_block(img_input, 32, strides=(2, 2))                          # 112，112，32    
     # 112,112,32 -> 112,112,64
-    x = _depthwise_conv_block(x, 64, depth_multiplier, block_id=1)
+    x = _depthwise_conv_block(x, 64, depth_multiplier, block_id=1)          # 112,112,64  
 
 
     # 112,112,64 -> 56,56,128
     x = _depthwise_conv_block(x, 128, depth_multiplier,
-                              strides=(2, 2), block_id=2)
+                              strides=(2, 2), block_id=2)                   # 56，56，128
     # 56,56,128 -> 56,56,128
-    x = _depthwise_conv_block(x, 128, depth_multiplier, block_id=3)
+    x = _depthwise_conv_block(x, 128, depth_multiplier, block_id=3)         # 56，56，128
 
 
     # 56,56,128 -> 28,28,256
     x = _depthwise_conv_block(x, 256, depth_multiplier,
-                              strides=(2, 2), block_id=4)
+                              strides=(2, 2), block_id=4)                   # 28，28，256
     # 28,28,256 -> 28,28,256
-    x = _depthwise_conv_block(x, 256, depth_multiplier, block_id=5)
+    x = _depthwise_conv_block(x, 256, depth_multiplier, block_id=5)         # 28，28，256
     
 
     # 28,28,256 -> 14,14,512
     x = _depthwise_conv_block(x, 512, depth_multiplier,
-                              strides=(2, 2), block_id=6)
+                              strides=(2, 2), block_id=6)                   # 14，14，512
     # 14,14,512 -> 14,14,512
-    x = _depthwise_conv_block(x, 512, depth_multiplier, block_id=7)
+    x = _depthwise_conv_block(x, 512, depth_multiplier, block_id=7)         # 14，14，512
     x = _depthwise_conv_block(x, 512, depth_multiplier, block_id=8)
     x = _depthwise_conv_block(x, 512, depth_multiplier, block_id=9)
     x = _depthwise_conv_block(x, 512, depth_multiplier, block_id=10)
@@ -49,33 +49,35 @@ def MobileNet(input_shape=[224,224,3],
 
     # 14,14,512 -> 7,7,1024
     x = _depthwise_conv_block(x, 1024, depth_multiplier,
-                              strides=(2, 2), block_id=12)
+                              strides=(2, 2), block_id=12)                  # 7，7，1024
     x = _depthwise_conv_block(x, 1024, depth_multiplier, block_id=13)
 
     # 7,7,1024 -> 1,1,1024
-    x = GlobalAveragePooling2D()(x)
-    x = Reshape((1, 1, 1024), name='reshape_1')(x)
-    x = Dropout(dropout, name='dropout')(x)
+    x = GlobalAveragePooling2D()(x)                                         # 1024
+    x = Reshape((1, 1, 1024), name='reshape_1')(x)                          # 1，1，1024
+    x = Dropout(dropout, name='dropout')(x)         
 
-    x = Conv2D(classes, (1, 1),padding='same', name='conv_preds')(x)
+    x = Conv2D(classes, (1, 1),padding='same', name='conv_preds')(x)        # 1，1，类别个数
     x = Activation('softmax', name='act_softmax')(x)
-    x = Reshape((classes,), name='reshape_2')(x)
+    x = Reshape((classes,), name='reshape_2')(x)                            # 类别个数
 
     inputs = img_input
 
     model = Model(inputs, x, name='mobilenet_1_0_224_tf')
-    model_name = 'mobilenet_1_0_224_tf.h5'
-    model.load_weights(model_name)
+    # model_name = 'mobilenet_1_0_224_tf.h5'
+    # model.load_weights(model_name)
 
     return model
 
+# 卷积+标准化+激活函数
 def _conv_block(inputs, filters, kernel=(3, 3), strides=(1, 1)):
     x = Conv2D(filters, kernel,
                padding='same',
                use_bias=False,
-               strides=strides,
+               strides=strides,               
                name='conv1')(inputs)
-    x = BatchNormalization(name='conv1_bn')(x)
+
+    x = BatchNormalization(name='conv1_bn')(x)    
     return Activation(relu6, name='conv1_relu')(x)
 
 
@@ -113,18 +115,20 @@ def preprocess_input(x):
 if __name__ == '__main__':
     model = MobileNet(input_shape=(224, 224, 3))
 
-    model_name = 'mobilenet_1_0_224_tf.h5'
-    weigh_path = BASE_WEIGHT_PATH + model_name
-    weights_path = get_file(model_name,
-                            weigh_path,
-                            cache_subdir='models')
-    img_path = 'elephant.jpg'
-    img = image.load_img(img_path, target_size=(224, 224))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-    print('Input image shape:', x.shape)
+    print(model.summary())
 
-    preds = model.predict(x)
-    print(np.argmax(preds))
-    print('Predicted:', decode_predictions(preds, 1))
+    # model_name = 'mobilenet_1_0_224_tf.h5'
+    # weigh_path = BASE_WEIGHT_PATH + model_name
+    # weights_path = get_file(model_name,
+    #                         weigh_path,
+    #                         cache_subdir='models')
+    # img_path = 'elephant.jpg'
+    # img = image.load_img(img_path, target_size=(224, 224))
+    # x = image.img_to_array(img)
+    # x = np.expand_dims(x, axis=0)
+    # x = preprocess_input(x)
+    # print('Input image shape:', x.shape)
+
+    # preds = model.predict(x)
+    # print(np.argmax(preds))
+    # print('Predicted:', decode_predictions(preds, 1))
