@@ -16,20 +16,20 @@ def VGG16(num_classes):
     image_input = Input(shape = (224,224,3))
     # 第一个卷积部分
     # 112，112，64
-    x = Conv2D(64,(3,3),activation = 'relu',padding = 'same',name = 'block1_conv1')(image_input)
-    x = Conv2D(64,(3,3),activation = 'relu',padding = 'same', name = 'block1_conv2')(x)
-    x = MaxPooling2D((2,2), strides = (2,2), name = 'block1_pool')(x)
+    x = Conv2D(64,(3,3),activation = 'relu',padding = 'same',name = 'block1_conv1')(image_input)    # 224，224，64
+    x = Conv2D(64,(3,3),activation = 'relu',padding = 'same', name = 'block1_conv2')(x)             # 224，224，64
+    x = MaxPooling2D((2,2), strides = (2,2), name = 'block1_pool')(x)                               # 112，112，64
 
     # 第二个卷积部分
     # 56,56,128
-    x = Conv2D(128,(3,3),activation = 'relu',padding = 'same',name = 'block2_conv1')(x)
-    x = Conv2D(128,(3,3),activation = 'relu',padding = 'same',name = 'block2_conv2')(x)
-    x = MaxPooling2D((2,2),strides = (2,2),name = 'block2_pool')(x)
+    x = Conv2D(128,(3,3),activation = 'relu',padding = 'same',name = 'block2_conv1')(x)             # 112，112，128
+    x = Conv2D(128,(3,3),activation = 'relu',padding = 'same',name = 'block2_conv2')(x)             # 112，112，128
+    x = MaxPooling2D((2,2),strides = (2,2),name = 'block2_pool')(x)                                 # 56，56，128
 
     # 第三个卷积部分
     # 28,28,256
-    x = Conv2D(256,(3,3),activation = 'relu',padding = 'same',name = 'block3_conv1')(x)
-    x = Conv2D(256,(3,3),activation = 'relu',padding = 'same',name = 'block3_conv2')(x)
+    x = Conv2D(256,(3,3),activation = 'relu',padding = 'same',name = 'block3_conv1')(x)             # 56，56，256
+    x = Conv2D(256,(3,3),activation = 'relu',padding = 'same',name = 'block3_conv2')(x)             # 
     x = Conv2D(256,(3,3),activation = 'relu',padding = 'same',name = 'block3_conv3')(x)
     x = MaxPooling2D((2,2),strides = (2,2),name = 'block3_pool')(x)
 
@@ -74,3 +74,4 @@ if __name__ == '__main__':
 
     preds = model.predict(x)
     print('Predicted:', decode_predictions(preds))
+
